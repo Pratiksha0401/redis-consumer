@@ -1,0 +1,68 @@
+
+spring:
+  profiles:
+    active: prod
+server:
+  port: 8085
+
+---
+spring:
+  profiles: local
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9095,localhost:9093,localhost:9094
+      key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: library-events-listener-group
+    producer:
+      bootstrap-servers: localhost:9092,localhost:9093,localhost:9094
+      key-serializer: org.apache.kafka.common.serialization.IntegerSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+  datasource:
+    url: jdbc:mysql://localhost:3306/consumer
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: password120596
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    generate-ddl: true
+
+---
+
+spring:
+  profiles: nonprod
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9095,localhost:9093,localhost:9094
+      key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: library-events-listener-group
+  datasource:
+    url: jdbc:oracle:thin:@34.87.9.238:1521:xe
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    username: system
+    password: system123
+  jpa:
+    database: oracle
+    database-platform: org.hibernate.dialect.OracleDriver
+    generate-ddl: true
+
+---
+spring:
+  profiles: prod
+  kafka:
+    consumer:
+      bootstrap-servers: 34.81.123.36:19094
+      key-deserializer: org.apache.kafka.common.serialization.LongDeserializer
+      value-deserializer: org.headstrait.redis.redisconsumer.deserializer.CustomDeserializer
+      group-id: redis-database-in-memory
+      auto-offset-reset: latest
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "org.headstrait.redis.deserializer.CustomDeserializer"
+---
+redis_key: energy-data
+
